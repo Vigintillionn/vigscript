@@ -15,7 +15,8 @@ pub enum Expr {
   },
   Ident {
     symbol: String
-  }
+  },
+  NullLit
 }
 
 #[derive(Debug)]

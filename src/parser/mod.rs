@@ -91,6 +91,10 @@ impl<'a> Parser<'a> {
     match tk {
       lexer::TokenType::Ident => ast::Expr::Ident { symbol: self.consume().value },
       lexer::TokenType::IntLit => ast::Expr::IntLit { value: self.consume().value.parse::<i32>().unwrap() },
+      lexer::TokenType::Null => {
+        self.consume();
+        ast::Expr::NullLit
+      },
       lexer::TokenType::OpenParen => {
         self.consume(); // consume the open paren
         let expr = self.parse_expr();
