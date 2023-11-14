@@ -1,5 +1,6 @@
 use std::fs;
 mod parser;
+mod runtime;
 
 fn main() {
     // Read a file
@@ -9,5 +10,6 @@ fn main() {
     let mut parser = parser::Parser::new(&tokens);
     let ast = parser.produce_ast();
 
-    println!("{:?}", ast);
+    let result = runtime::evaluate(ast);
+    println!("{:?}", result);
 }
