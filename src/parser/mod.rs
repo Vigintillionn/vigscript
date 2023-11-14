@@ -1,5 +1,5 @@
 use std::iter::Peekable;
-mod ast;
+pub mod ast;
 pub mod lexer;
 
 pub struct Parser<'a> {
