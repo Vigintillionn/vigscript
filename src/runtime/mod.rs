@@ -1,5 +1,5 @@
 mod values;
-use core::panic;
+// use core::panic;
 
 use crate::parser::ast;
 
@@ -13,8 +13,8 @@ pub fn evaluate(prog: ast::Program) -> values::RuntimeValue {
 
 fn evaluate_node(node: ast::Stmt) -> values::RuntimeValue {
   match node {
-    ast::Stmt::Expr(node) => evaluate_expr(node),
-    _ => panic!("Not implemented")
+    ast::Stmt::Expr(node) => evaluate_expr(node)
+    // _ => panic!("Not implemented")
   }
 }
 
