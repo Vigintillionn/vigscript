@@ -9,6 +9,7 @@ pub enum TokenType {
   CloseParen,
   BinOp,
   Let,
+  Null,
   EOF
 }
 
@@ -21,6 +22,7 @@ pub struct Token {
 fn create_reserved() -> HashMap<&'static str, TokenType> {
   let mut reserved = HashMap::new();
   reserved.insert("let", TokenType::Let);
+  reserved.insert("null", TokenType::Null);
   reserved
 }
 
