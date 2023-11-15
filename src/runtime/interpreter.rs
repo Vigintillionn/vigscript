@@ -1,6 +1,8 @@
+use crate::parser::ast::Property;
 use crate::runtime::values;
 use crate::runtime::environment;
 use core::panic;
+use std::collections::HashMap;
 
 use crate::parser::ast;
 
@@ -26,6 +28,7 @@ fn evaluate_expr(node: ast::Expr, env: &mut environment::Environment) -> values:
     ast::Expr::BinExp { left, op, right } => evaluate_binary_expr(*left, op, *right, env),
     ast::Expr::Ident { symbol } => evaluate_ident(symbol, env),
     ast::Expr::Assign { assignee, value } => evaluate_assignment(*assignee, *value, env),
+    ast::Expr::ObjectLit { properties } => evaluate_object_expr(properties, env),
     _ => panic!("Not implemented {:?}", node)//values::RuntimeValue::Null
   }
 }
@@ -51,6 +54,20 @@ fn evaluate_binary_expr(left: ast::Expr, op: String, right: ast::Expr, env: &mut
 
 fn evaluate_ident(symbol: String, env: &mut environment::Environment) -> values::RuntimeValue {
   env.lookup_var(symbol)
+}
+
+fn evaluate_object_expr(properties: Vec<Property>, env: &mut environment::Environment) -> values::RuntimeValue {
+  let mut object = values::Object { properties: HashMap::new() };
+
+  for prop in properties {
+    let runtime_val = match prop.value {
+      Some(expr) => evaluate_expr(*expr, env),
+      None => env.lookup_var(prop.key.clone())
+    };
+    object.properties.insert(prop.key, runtime_val);
+  }
+
+  values::RuntimeValue::Object(object)
 }
 
 fn evaluate_var_decl(muteable: bool, name: String, value: Option<ast::Expr>, env: &mut environment::Environment) -> values::RuntimeValue {
