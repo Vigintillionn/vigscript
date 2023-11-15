@@ -16,7 +16,7 @@ pub enum Expr {
     right: Box<Expr>
   },
   IntLit {
-    value: i32
+    value: f32
   },
   Ident {
     symbol: String
