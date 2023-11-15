@@ -5,7 +5,7 @@ mod runtime;
 fn main() {
     // check if there is a file to run in the arguments
     let args: Vec<String> = std::env::args().collect();
-    let mut env = runtime::environment::Environment::new(None);
+    let mut env = runtime::environment::create_global_environment();
 
     if args.len() > 1 {
         let filename = &args[1];
