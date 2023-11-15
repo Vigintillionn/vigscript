@@ -25,7 +25,8 @@ fn evaluate_expr(node: ast::Expr, env: &mut environment::Environment) -> values:
     ast::Expr::IntLit { value } => values::RuntimeValue::Number { value },
     ast::Expr::BinExp { left, op, right } => evaluate_binary_expr(*left, op, *right, env),
     ast::Expr::Ident { symbol } => evaluate_ident(symbol, env),
-    _ => values::RuntimeValue::Null
+    ast::Expr::Assign { assignee, value } => evaluate_assignment(*assignee, *value, env),
+    _ => panic!("Not implemented {:?}", node)//values::RuntimeValue::Null
   }
 }
 
@@ -58,4 +59,14 @@ fn evaluate_var_decl(muteable: bool, name: String, value: Option<ast::Expr>, env
     None => values::RuntimeValue::Null
   };
   env.declare_var(name, res, muteable)
+}
+
+fn evaluate_assignment(assignee: ast::Expr, value: ast::Expr, env: &mut environment::Environment) -> values::RuntimeValue {
+  match assignee {
+    ast::Expr::Ident { symbol } => {
+      let res = evaluate_expr(value, env);
+      env.assign_var(symbol, &res)
+    },
+    _ => panic!("You can't assign to {:?}", assignee)
+  }
 }

@@ -53,7 +53,20 @@ impl<'a> Parser<'a> {
   }
 
   fn parse_expr(&mut self) -> ast::Expr {
-    self.parse_additive_expr()
+    self.parse_assignment_expr()
+    // self.parse_additive_expr()
+  }
+
+  fn parse_assignment_expr(&mut self) -> ast::Expr {
+    let left = self.parse_additive_expr(); // in future switch out for objects
+    if self.at().token_type == lexer::TokenType::Eq {
+      self.consume();
+      let value = self.parse_expr();
+      ast::Expr::Assign { assignee: Box::new(left), value: Box::new(value) }
+    }
+    else {
+      left
+    }
   }
 
   // Left hand prescedende -> 10 + 5 - 5 = (10 + 5) - 5

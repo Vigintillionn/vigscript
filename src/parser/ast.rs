@@ -20,6 +20,10 @@ pub enum Expr {
   },
   Ident {
     symbol: String
+  },
+  Assign {
+    assignee: Box<Expr>,
+    value: Box<Expr>
   }
 }
 
