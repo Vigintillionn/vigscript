@@ -1,18 +1,20 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use crate::runtime::values;
 
 #[derive(Debug)]
 pub struct Environment {
   parent: Option<Box<Environment>>,
-  variables: HashMap<String, values::RuntimeValue>
+  variables: HashMap<String, values::RuntimeValue>,
+  constants: HashSet<String>
 }
 
 impl Environment {
   pub fn new(parent_env: Option<Environment>) -> Environment {
     let mut env = Environment {
       parent: None,
-      variables: HashMap::new()
+      variables: HashMap::new(),
+      constants: HashSet::new()
     };
     if let Some(parent) = parent_env {
       env.parent = Some(Box::new(parent));
@@ -20,9 +22,12 @@ impl Environment {
     env
   }
 
-  pub fn declare_var(&mut self, name: String, value: values::RuntimeValue) -> values::RuntimeValue {
+  pub fn declare_var(&mut self, name: String, value: values::RuntimeValue, muteable: bool) -> values::RuntimeValue {
     if self.variables.contains_key(&name) {
       panic!("Variable {} already declared", name);
+    }
+    if !muteable  {
+      self.constants.insert(name.clone());
     }
     self.variables.insert(name, value.clone());
     value
@@ -30,6 +35,9 @@ impl Environment {
 
   pub fn assign_var(&mut self, name: String, value: &values::RuntimeValue) -> values::RuntimeValue {
     let env = self.resolve(name.clone());
+    if env.constants.contains(&name) {
+      panic!("Cannot assign to constant {}", name);
+    }
     env.variables.insert(name, (*value).clone());
     value.clone()
   }

@@ -15,7 +15,7 @@ pub fn evaluate(prog: ast::Program, env: &mut environment::Environment) -> value
 fn evaluate_node(node: ast::Stmt, env: &mut environment::Environment) -> values::RuntimeValue {
   match node {
     ast::Stmt::Expr(node) => evaluate_expr(node, env),
-    ast::Stmt::VarDecl { muteable: _, name, value } => evaluate_var_decl(name, value, env),
+    ast::Stmt::VarDecl { muteable, name, value } => evaluate_var_decl(muteable, name, value, env),
     _ => panic!("Not implemented {:?}", node)
   }
 }
@@ -52,10 +52,10 @@ fn evaluate_ident(symbol: String, env: &mut environment::Environment) -> values:
   env.lookup_var(symbol)
 }
 
-fn evaluate_var_decl(name: String, value: Option<ast::Expr>, env: &mut environment::Environment) -> values::RuntimeValue {
+fn evaluate_var_decl(muteable: bool, name: String, value: Option<ast::Expr>, env: &mut environment::Environment) -> values::RuntimeValue {
   let res = match value {
     Some(expr) => evaluate_expr(expr, env),
     None => values::RuntimeValue::Null
   };
-  env.declare_var(name, res)
+  env.declare_var(name, res, muteable)
 }
