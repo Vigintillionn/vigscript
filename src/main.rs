@@ -6,9 +6,6 @@ fn main() {
     // check if there is a file to run in the arguments
     let args: Vec<String> = std::env::args().collect();
     let mut env = runtime::environment::Environment::new(None);
-    env.declare_var("true".to_string(), runtime::values::RuntimeValue::Bool { value: true  }, true);
-    env.declare_var("false".to_string(), runtime::values::RuntimeValue::Bool { value: false }, true);
-    env.declare_var("null".to_string(), runtime::values::RuntimeValue::Null, true);
 
     if args.len() > 1 {
         let filename = &args[1];

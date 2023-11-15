@@ -1,9 +1,16 @@
 use std::collections::{HashMap, HashSet};
-
 use crate::runtime::values;
+
+fn setup_scope(env: &mut Environment) {
+  env.declare_var("true".to_string(), values::RuntimeValue::Bool { value: true  }, true);
+  env.declare_var("false".to_string(), values::RuntimeValue::Bool { value: false }, true);
+  env.declare_var("null".to_string(), values::RuntimeValue::Null, true);
+
+}
 
 #[derive(Debug)]
 pub struct Environment {
+  global: bool,
   parent: Option<Box<Environment>>,
   variables: HashMap<String, values::RuntimeValue>,
   constants: HashSet<String>
@@ -12,12 +19,16 @@ pub struct Environment {
 impl Environment {
   pub fn new(parent_env: Option<Environment>) -> Environment {
     let mut env = Environment {
+      global: parent_env.is_none(),
       parent: None,
       variables: HashMap::new(),
       constants: HashSet::new()
     };
     if let Some(parent) = parent_env {
       env.parent = Some(Box::new(parent));
+    }
+    if env.global {
+      setup_scope(&mut env);
     }
     env
   }
