@@ -1,6 +1,11 @@
 #[derive(Debug, Clone)]
 pub enum Stmt {
-  Expr(Expr)
+  Expr(Expr),
+  VarDecl {
+    muteable: bool,
+    name: String,
+    value: Option<Expr>
+  }
 }
 
 #[derive(Debug, Clone)]
@@ -15,8 +20,7 @@ pub enum Expr {
   },
   Ident {
     symbol: String
-  },
-  NullLit
+  }
 }
 
 #[derive(Debug)]

@@ -5,11 +5,12 @@ pub enum TokenType {
   IntLit,
   Ident,
   Eq,
+  Semi,
   OpenParen,
   CloseParen,
   BinOp,
   Let,
-  Null,
+  Const,
   EOF
 }
 
@@ -22,7 +23,7 @@ pub struct Token {
 fn create_reserved() -> HashMap<&'static str, TokenType> {
   let mut reserved = HashMap::new();
   reserved.insert("let", TokenType::Let);
-  reserved.insert("null", TokenType::Null);
+  reserved.insert("const", TokenType::Const);
   reserved
 }
 
@@ -37,6 +38,7 @@ pub fn tokenize(src: &str) -> Vec<Token> {
       '(' => tokens.push(Token { token_type: TokenType::OpenParen, value: ch.to_string() }),
       ')' => tokens.push(Token { token_type: TokenType::CloseParen, value: ch.to_string() }),
       '=' => tokens.push(Token { token_type: TokenType::Eq, value: ch.to_string() }),
+      ';' => tokens.push(Token { token_type: TokenType::Semi, value: ch.to_string() }),
       '+' | '-' | '*' | '/' | '%' => tokens.push(Token { token_type: TokenType::BinOp, value: ch.to_string() }),
       '0'..='9' => {
         let mut value = ch.to_string();

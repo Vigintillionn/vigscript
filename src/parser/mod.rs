@@ -42,8 +42,14 @@ impl<'a> Parser<'a> {
   }
 
   fn parse_stmt(&mut self) -> ast::Stmt {
-    let expr = self.parse_expr();
-    ast::Stmt::Expr(expr)
+    match self.at().token_type {
+      lexer::TokenType::Let => self.parse_var_decl(),
+      lexer::TokenType::Const => self.parse_var_decl(),
+      _ => {
+        let expr = self.parse_expr();
+        ast::Stmt::Expr(expr)
+      }
+    }
   }
 
   fn parse_expr(&mut self) -> ast::Expr {
@@ -91,10 +97,6 @@ impl<'a> Parser<'a> {
     match tk {
       lexer::TokenType::Ident => ast::Expr::Ident { symbol: self.consume().value },
       lexer::TokenType::IntLit => ast::Expr::IntLit { value: self.consume().value.parse::<i32>().unwrap() },
-      lexer::TokenType::Null => {
-        self.consume();
-        ast::Expr::NullLit
-      },
       lexer::TokenType::OpenParen => {
         self.consume(); // consume the open paren
         let expr = self.parse_expr();
@@ -103,6 +105,33 @@ impl<'a> Parser<'a> {
       }
       _ => panic!("Unexpected token type: {:?}", tk),
     }
+  }
+
+
+  fn parse_var_decl(&mut self) -> ast::Stmt {
+    let is_muteable = self.consume().token_type == lexer::TokenType::Let;
+    let ident = self.consume_expected(lexer::TokenType::Ident, "Expected a Identifier.");
+
+    if self.at().token_type == lexer::TokenType::Semi {
+      self.consume();
+      if !is_muteable {
+        panic!("Const declarations must have a value");
+      }
+      let var = ast::Stmt::VarDecl {
+        muteable: is_muteable,
+        name: ident.value,
+        value: None
+      };
+      return var
+    } 
+    self.consume_expected(lexer::TokenType::Eq, "Expected a '='");
+    let decl = ast::Stmt::VarDecl {
+      muteable: is_muteable,
+      name: ident.value,
+      value: Some(self.parse_expr())
+    };
+    self.consume_expected(lexer::TokenType::Semi, "Expected a ';'");
+    decl
   }
 }
 
