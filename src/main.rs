@@ -5,19 +5,23 @@ mod runtime;
 fn main() {
     // check if there is a file to run in the arguments
     let args: Vec<String> = std::env::args().collect();
+    let mut env = runtime::environment::Environment::new(None);
+    env.declare_var("x".to_string(), runtime::values::RuntimeValue::Number { value: 10 });
+    env.declare_var("true".to_string(), runtime::values::RuntimeValue::Bool { value: true  });
+    env.declare_var("false".to_string(), runtime::values::RuntimeValue::Bool { value: false });
+    env.declare_var("null".to_string(), runtime::values::RuntimeValue::Null);
 
     if args.len() > 1 {
         let filename = &args[1];
-        println!("{}", &filename);
         let contents = fs::read_to_string(filename).expect("Something went wrong reading the file");
 
-        interpret(&contents);
+        interpret(&contents, &mut env);
     } else {
-        repl();
+        repl(&mut env);
     }
 }
 
-fn repl() {
+fn repl(env: &mut runtime::environment::Environment) {
     // Create a repl in the terminal
     println!("Repl version 0.1.0");
     let mut input = String::new();
@@ -26,16 +30,16 @@ fn repl() {
         if input == "exit\n" {
             break;
         }
-        interpret(&input);
+        interpret(&input, env);
         input.clear();
     }
 }
 
-fn interpret(input: &str) {
+fn interpret(input: &str, env: &mut runtime::environment::Environment) {
     let tokens = parser::lexer::tokenize(&input);
     let mut parser = parser::Parser::new(&tokens);
     let ast = parser.produce_ast();
 
-    let result = runtime::evaluate(ast);
+    let result = runtime::evaluate(ast, env);
     println!("{:?}", result);
 }

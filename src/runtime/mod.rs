@@ -1,34 +1,37 @@
-mod values;
-// use core::panic;
+pub mod values;
+pub mod environment;
+use core::panic;
 
 use crate::parser::ast;
 
-pub fn evaluate(prog: ast::Program) -> values::RuntimeValue {
+pub fn evaluate(prog: ast::Program, env: &mut environment::Environment) -> values::RuntimeValue {
   let mut last = values::RuntimeValue::Null;
   for stmt in prog.body {
-    last = evaluate_node(stmt);
+    last = evaluate_node(stmt, env);
   }
   last
 }
 
-fn evaluate_node(node: ast::Stmt) -> values::RuntimeValue {
+fn evaluate_node(node: ast::Stmt, env: &mut environment::Environment) -> values::RuntimeValue {
   match node {
-    ast::Stmt::Expr(node) => evaluate_expr(node)
-    // _ => panic!("Not implemented")
+    ast::Stmt::Expr(node) => evaluate_expr(node, env),
+    ast::Stmt::VarDecl { muteable: _, name, value } => evaluate_var_decl(name, value, env),
+    _ => panic!("Not implemented {:?}", node)
   }
 }
 
-fn evaluate_expr(node: ast::Expr) -> values::RuntimeValue {
+fn evaluate_expr(node: ast::Expr, env: &mut environment::Environment) -> values::RuntimeValue {
   match node {
     ast::Expr::IntLit { value } => values::RuntimeValue::Number { value },
-    ast::Expr::BinExp { left, op, right } => evaluate_binary_expr(*left, op, *right),
+    ast::Expr::BinExp { left, op, right } => evaluate_binary_expr(*left, op, *right, env),
+    ast::Expr::Ident { symbol } => evaluate_ident(symbol, env),
     _ => values::RuntimeValue::Null
   }
 }
 
-fn evaluate_binary_expr(left: ast::Expr, op: String, right: ast::Expr) -> values::RuntimeValue {
-  let lhs = evaluate_expr(left);
-  let rhs = evaluate_expr(right);
+fn evaluate_binary_expr(left: ast::Expr, op: String, right: ast::Expr, env: &mut environment::Environment) -> values::RuntimeValue {
+  let lhs = evaluate_expr(left, env);
+  let rhs = evaluate_expr(right, env);
 
   match (lhs, rhs) {
     (values::RuntimeValue::Number { value: lhs }, values::RuntimeValue::Number { value: rhs }) => {
@@ -43,4 +46,16 @@ fn evaluate_binary_expr(left: ast::Expr, op: String, right: ast::Expr) -> values
     },
     _ => values::RuntimeValue::Null
   }
+}
+
+fn evaluate_ident(symbol: String, env: &mut environment::Environment) -> values::RuntimeValue {
+  env.lookup_var(symbol)
+}
+
+fn evaluate_var_decl(name: String, value: Option<ast::Expr>, env: &mut environment::Environment) -> values::RuntimeValue {
+  let res = match value {
+    Some(expr) => evaluate_expr(expr, env),
+    None => values::RuntimeValue::Null
+  };
+  env.declare_var(name, res)
 }
