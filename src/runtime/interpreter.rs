@@ -61,8 +61,8 @@ fn evaluate_object_expr(properties: Vec<Property>, env: &mut environment::Enviro
 
   for prop in properties {
     let runtime_val = match prop.value {
-      Some(expr) => evaluate_expr(*expr, env),
-      None => env.lookup_var(prop.key.clone())
+      None => env.lookup_var(prop.key.clone()),
+      Some(expr) => evaluate_expr(*expr, env)
     };
     object.properties.insert(prop.key, runtime_val);
   }
