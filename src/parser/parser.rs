@@ -58,7 +58,7 @@ impl<'a> Parser<'a> {
   }
 
   fn parse_assignment_expr(&mut self) -> ast::Expr {
-    let left = self.parse_additive_expr(); // in future switch out for objects
+    let left = self.parse_object_expr();
     if self.at().token_type == lexer::TokenType::Eq {
       self.consume();
       let value = self.parse_expr();
@@ -67,6 +67,40 @@ impl<'a> Parser<'a> {
     else {
       left
     }
+  }
+
+  fn parse_object_expr(&mut self) -> ast::Expr {
+    if self.at().token_type != lexer::TokenType::OpenBrace {
+      return self.parse_additive_expr();
+    }
+
+    self.consume(); // consume the open brace
+    let mut properties = Vec::new();
+    while self.not_eof() && self.at().token_type != lexer::TokenType::CloseBrace {
+      // { key: value, key2: value }
+      // { key }
+      let key = self.consume_expected(lexer::TokenType::Ident, "Object literal key expected.");
+      if self.at().token_type == lexer::TokenType::Comma {
+        self.consume();
+        properties.push(ast::Property { key: key.value, value: None });
+        continue;
+      }
+      else if self.at().token_type == lexer::TokenType::CloseBrace {
+        properties.push(ast::Property { key: key.value, value: None });
+        continue;
+      }
+
+      self.consume_expected(lexer::TokenType::Colon, "Missing colon following identifier in Object literal.");
+      let value = self.parse_expr();
+      properties.push(ast::Property { key: key.value, value: Some(Box::new(value)) });
+
+      if self.at().token_type != lexer::TokenType::CloseBrace {
+        self.consume_expected(lexer::TokenType::Comma, "Object literal missing comma or closing brace following property.");
+      }
+    }
+
+    self.consume_expected(lexer::TokenType::CloseBrace, "Object literal missing closing brace.");
+    ast::Expr::ObjectLit { properties }
   }
 
   // Left hand prescedende -> 10 + 5 - 5 = (10 + 5) - 5

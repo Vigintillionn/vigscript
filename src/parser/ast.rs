@@ -24,6 +24,10 @@ pub enum Expr {
   Assign {
     assignee: Box<Expr>,
     value: Box<Expr>
+  },
+  Property(Property),
+  ObjectLit {
+    properties: Vec<Property>
   }
 }
 
@@ -32,3 +36,8 @@ pub struct Program {
   pub body: Vec<Stmt>
 }
 
+#[derive(Debug, Clone)]
+pub struct Property {
+  pub key: String,
+  pub value: Option<Box<Expr>>
+}
