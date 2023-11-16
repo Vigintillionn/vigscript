@@ -28,6 +28,15 @@ pub enum Expr {
   Property(Property),
   ObjectLit {
     properties: Vec<Property>
+  },
+  Member {
+    object: Box<Expr>,
+    property: Box<Expr>,
+    computed: bool
+  },
+  Call {
+    callee: Box<Expr>,
+    args: Vec<Expr>
   }
 }
 

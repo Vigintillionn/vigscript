@@ -6,11 +6,14 @@ pub enum TokenType {
   Ident,
   Eq,
   Semi,
-  OpenParen,
-  CloseParen,
-  OpenBrace,
-  CloseBrace,
+  OpenParen, // (
+  CloseParen, // )
+  OpenBrace, // {
+  CloseBrace, // }
+  OpenBracket, // [
+  CloseBracket, // ]
   Comma,
+  Dot,
   Colon,
   BinOp,
   Let,
@@ -43,9 +46,11 @@ pub fn tokenize(src: &str) -> Vec<Token> {
       ')' => tokens.push(Token { token_type: TokenType::CloseParen, value: ch.to_string() }),
       '{' => tokens.push(Token { token_type: TokenType::OpenBrace, value: ch.to_string() }),
       '}' => tokens.push(Token { token_type: TokenType::CloseBrace, value: ch.to_string() }),
+      '[' => tokens.push(Token { token_type: TokenType::OpenBracket, value: ch.to_string() }),
+      ']' => tokens.push(Token { token_type: TokenType::CloseBracket, value: ch.to_string() }),
       ':' => tokens.push(Token { token_type: TokenType::Colon, value: ch.to_string() }),
       ',' => tokens.push(Token { token_type: TokenType::Comma, value: ch.to_string() }),
-
+      '.' => tokens.push(Token { token_type: TokenType::Dot, value: ch.to_string() }),
       '=' => tokens.push(Token { token_type: TokenType::Eq, value: ch.to_string() }),
       ';' => tokens.push(Token { token_type: TokenType::Semi, value: ch.to_string() }),
       '+' | '-' | '*' | '/' | '%' => tokens.push(Token { token_type: TokenType::BinOp, value: ch.to_string() }),

@@ -119,11 +119,11 @@ impl<'a> Parser<'a> {
   }
 
   fn parse_multiplicitive_expr(&mut self) -> Expr {
-    let mut left = self.parse_primary_expr();
+    let mut left = self.parse_call_member_expr();
 
     while self.at().value == "*" || self.at().value == "/" || self.at().value == "%" {
       let op = self.consume().value;
-      let right = self.parse_primary_expr();
+      let right = self.parse_call_member_expr();
       left = Expr::BinExp { 
         left: Box::new(left.clone()), 
         op, 
@@ -173,6 +173,71 @@ impl<'a> Parser<'a> {
     };
     self.consume_expected(TokenType::Semi, "Expected a ';'");
     decl
+  }
+
+  fn parse_call_member_expr(&mut self) -> Expr {
+    let member = self.parse_member_expr();
+
+    if self.at().token_type == TokenType::OpenParen {
+      self.parse_call_expr(member)
+    } else {
+      member
+    }
+  }
+
+  fn parse_call_expr(&mut self, callee: Expr) -> Expr {
+    let mut call_expr = Expr::Call {
+      callee: Box::new(callee),
+      args: self.parse_args()
+    };
+    
+    if self.at().token_type == TokenType::OpenParen {
+      call_expr = self.parse_call_expr(call_expr)
+    }
+    call_expr
+  }
+
+  fn parse_args(&mut self) -> Vec<Expr> {
+    let mut args = Vec::new();
+    self.consume_expected(TokenType::OpenParen, "Expected a '('");
+    while self.at().token_type != TokenType::CloseParen {
+      args.push(self.parse_expr());
+      if self.at().token_type != TokenType::CloseParen {
+        self.consume_expected(TokenType::Comma, "Expected a ','");
+      }
+    }
+    self.consume_expected(TokenType::CloseParen, "Expected a ')'");
+    args
+  }
+
+  fn parse_member_expr(&mut self) -> Expr {
+    let mut object = self.parse_primary_expr();
+
+    while self.at().token_type == TokenType::Dot || self.at().token_type == TokenType::OpenBracket {
+      let operator = self.consume();
+      let property: Expr;
+      let computed: bool;
+
+      if operator.token_type == TokenType::Dot {
+        computed = false;
+        property = self.parse_primary_expr();
+
+        if !matches!(property, Expr::Ident { .. }) {
+          panic!("Expected an identifier after '.'");
+        }
+      } else {
+        computed = true;
+        property = self.parse_expr();
+        self.consume_expected(TokenType::CloseBracket, "Expected a ']'");
+      }
+
+      object = Expr::Member {
+        object: Box::new(object),
+        property: Box::new(property),
+        computed
+      }
+    }
+    object
   }
 }
 
