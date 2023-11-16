@@ -45,6 +45,7 @@ impl<'a> Parser<'a> {
     match self.at().token_type {
       TokenType::Let => self.parse_var_decl(),
       TokenType::Const => self.parse_var_decl(),
+      TokenType::Func => self.parse_func_decl(),
       _ => {
         let expr = self.parse_expr();
         Stmt::Expr(expr)
@@ -173,6 +174,30 @@ impl<'a> Parser<'a> {
     };
     self.consume_expected(TokenType::Semi, "Expected a ';'");
     decl
+  }
+
+  fn parse_func_decl(&mut self) -> Stmt {
+    self.consume();
+    let name = self.consume_expected(TokenType::Ident, "Expected a Identifier as function name.").value;
+    let params: Vec<String> = self.parse_args().iter().map(|arg| {
+      match arg {
+        Expr::Ident { symbol } => symbol.clone(),
+        _ => panic!("Expected an identifier as function argument")
+      }
+    }).collect();
+
+    self.consume_expected(TokenType::OpenBrace, "Expected a '{' to open function body.");
+    let mut body: Vec<Stmt> = Vec::new();
+    while self.at().token_type != TokenType::EOF && self.at().token_type != TokenType::CloseBrace {
+      body.push(self.parse_stmt());
+    }
+    self.consume_expected(TokenType::CloseBrace, "Expected a '}' to close function body.");
+    let func = Stmt::FuncDecl {
+      params,
+      name,
+      body
+    };
+    func
   }
 
   fn parse_call_member_expr(&mut self) -> Expr {

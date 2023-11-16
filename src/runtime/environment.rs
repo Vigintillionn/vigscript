@@ -3,14 +3,44 @@ use crate::runtime::values;
 
 pub fn create_global_environment() -> Environment {
   let mut env = Environment::new(None);
-  env.declare_var("true".to_string(), values::RuntimeValue::Bool { value: true  }, true);
-  env.declare_var("false".to_string(), values::RuntimeValue::Bool { value: false }, true);
-  env.declare_var("null".to_string(), values::RuntimeValue::Null, true);
+  env.declare_var("true".to_string(), values::RuntimeValue::Bool { value: true  }, false);
+  env.declare_var("false".to_string(), values::RuntimeValue::Bool { value: false }, false);
+  env.declare_var("null".to_string(), values::RuntimeValue::Null, false);
+
+  env.declare_var("print".to_string(), values::RuntimeValue::NativeFunction { 
+    body: |args, _| {
+      for arg in args {
+        println!("{:?}", arg);
+      }
+      values::RuntimeValue::Null
+    }
+  }, false);
+  // env.declare_var("now".to_string(), values::RuntimeValue::NativeFunction {
+  //   body: |_, _| {
+  //     let start = std::time::SystemTime::now();
+  //     let since_the_epoch = start.duration_since(std::time::UNIX_EPOCH).expect("Time went backwards");
+  //     values::RuntimeValue::Number { value: since_the_epoch.as_secs_f32() }
+  //   }
+  // }, false);
+
+  env.declare_var("Date".to_string(), values::RuntimeValue::Object(values::Object {
+    properties: {
+      let mut map = HashMap::new();
+      map.insert("now".to_string(), values::RuntimeValue::NativeFunction {
+        body: |_, _| {
+          let start = std::time::SystemTime::now();
+          let since_the_epoch = start.duration_since(std::time::UNIX_EPOCH).expect("Time went backwards");
+          values::RuntimeValue::Number { value: since_the_epoch.as_secs_f32() }
+        }
+      });
+      map
+    }
+  }), false);
 
   env
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Environment {
   parent: Option<Box<Environment>>,
   variables: HashMap<String, values::RuntimeValue>,

@@ -12,6 +12,7 @@ pub enum TokenType {
   CloseBrace, // }
   OpenBracket, // [
   CloseBracket, // ]
+  Func,
   Comma,
   Dot,
   Colon,
@@ -31,6 +32,7 @@ fn create_reserved() -> HashMap<&'static str, TokenType> {
   let mut reserved = HashMap::new();
   reserved.insert("let", TokenType::Let);
   reserved.insert("const", TokenType::Const);
+  reserved.insert("func", TokenType::Func);
   reserved
 }
 

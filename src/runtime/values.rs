@@ -1,5 +1,8 @@
 use std::collections::HashMap;
 
+use crate::runtime::environment::Environment;
+use crate::parser::ast::Stmt;
+
 #[derive(Debug, Clone)]
 pub enum RuntimeValue {
   Null,
@@ -9,7 +12,16 @@ pub enum RuntimeValue {
   Bool {
     value: bool
   },
-  Object(Object)
+  Object(Object),
+  NativeFunction {
+    body: fn(Vec<RuntimeValue>, &mut Environment) -> RuntimeValue
+  },
+  Function {
+    name: String,
+    params: Vec<String>,
+    decl_env: Environment,
+    body: Vec<Stmt>
+  } 
 }
 
 #[derive(Debug, Clone)]

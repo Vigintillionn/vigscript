@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use crate::runtime::environment::Environment;
 use crate::runtime::values::{RuntimeValue, Object};
 use crate::parser::ast::{Expr, Property};
+use crate::runtime::interpreter::evaluate_node;
 
 pub fn evaluate_expr(node: Expr, env: &mut Environment) -> RuntimeValue {
   match node {
@@ -11,6 +12,7 @@ pub fn evaluate_expr(node: Expr, env: &mut Environment) -> RuntimeValue {
     Expr::Ident { symbol } => evaluate_ident(symbol, env),
     Expr::Assign { assignee, value } => evaluate_assignment(*assignee, *value, env),
     Expr::ObjectLit { properties } => evaluate_object_expr(properties, env),
+    Expr::Call { callee, args } => evaluate_call_expr(callee, args, env),
     _ => panic!("Not implemented {:?}", node)//values::RuntimeValue::Null
   }
 }
@@ -59,5 +61,29 @@ pub fn evaluate_assignment(assignee: Expr, value: Expr, env: &mut Environment) -
       env.assign_var(symbol, &res)
     },
     _ => panic!("You can't assign to {:?}", assignee)
+  }
+}
+
+pub fn evaluate_call_expr(callee: Box<Expr>, args: Vec<Expr>, env: &mut Environment) -> RuntimeValue {
+  let runtime_args: Vec<RuntimeValue> = args.iter().map(|arg| evaluate_expr(arg.clone(), env)).collect();
+  let func = evaluate_expr(*callee, env);
+
+  match func {
+    RuntimeValue::NativeFunction { body } => body(runtime_args, env),
+    RuntimeValue::Function { name: _, params, decl_env, body } => {
+      let mut scope = Environment::new(Some(decl_env));
+      for (i, arg) in runtime_args.iter().enumerate() {
+        // TODO: Check bounds here.
+        // verify arity of function
+        scope.declare_var(params[i].clone(), arg.clone(), true);
+      }
+
+      let mut res: RuntimeValue = RuntimeValue::Null;
+      for stmt in body {
+        res = evaluate_node(stmt, &mut scope);
+      }
+      res
+    },
+    _ => panic!("You can only call functions")
   }
 }

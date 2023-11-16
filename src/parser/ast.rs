@@ -5,6 +5,11 @@ pub enum Stmt {
     muteable: bool,
     name: String,
     value: Option<Expr>
+  },
+  FuncDecl {
+    params: Vec<String>,
+    name: String,
+    body: Vec<Stmt>
   }
 }
 
