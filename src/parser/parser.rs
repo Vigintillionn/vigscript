@@ -46,6 +46,7 @@ impl<'a> Parser<'a> {
       TokenType::Let => self.parse_var_decl(),
       TokenType::Const => self.parse_var_decl(),
       TokenType::Func => self.parse_func_decl(),
+      TokenType::Ret => self.parse_return(),
       _ => {
         let expr = self.parse_expr();
         Stmt::Expr(expr)
@@ -151,29 +152,74 @@ impl<'a> Parser<'a> {
 
 
   fn parse_var_decl(&mut self) -> Stmt {
-    let is_muteable = self.consume().token_type == TokenType::Let;
-    let ident = self.consume_expected(TokenType::Ident, "Expected a Identifier.");
-
-    if self.at().token_type == TokenType::Semi {
-      self.consume();
-      if !is_muteable {
-        panic!("Const declarations must have a value");
-      }
-      let var = Stmt::VarDecl {
-        muteable: is_muteable,
-        name: ident.value,
-        value: None
-      };
-      return var
-    } 
-    self.consume_expected(TokenType::Eq, "Expected a '='");
-    let decl = Stmt::VarDecl {
-      muteable: is_muteable,
-      name: ident.value,
-      value: Some(self.parse_expr())
+    let token_type = self.consume().token_type;
+    let var: Stmt = match token_type {
+      TokenType::Let => {
+        let mutable: bool;
+        if self.at().token_type == TokenType::Mut {
+          mutable = true;
+          self.consume();
+        } else {
+          mutable = false;
+        }
+        
+        let ident = self.consume_expected(TokenType::Ident, "Expected a Identifier.");
+        if self.at().token_type == TokenType::Semi {
+          self.consume();
+          Stmt::VarDecl {
+            mutable,
+            name: ident.value,
+            value: None
+          }
+        } else {
+          self.consume_expected(TokenType::Eq, "Expected a '='");
+          let expr = self.parse_expr();
+          self.consume_expected(TokenType::Semi, "Expected a ';'");
+          Stmt::VarDecl {
+            mutable,
+            name: ident.value,
+            value: Some(expr)
+          }
+        }
+      },
+      TokenType::Const => {
+        let ident = self.consume_expected(TokenType::Ident, "Expected a Identifier.");
+        self.consume_expected(TokenType::Eq, "Expected a '='");
+        let decl = Stmt::VarDecl {
+          mutable: false,
+          name: ident.value,
+          value: Some(self.parse_expr())
+        };
+        self.consume_expected(TokenType::Semi, "Expected a ';'");
+        decl
+      },
+      _ => panic!("Unexpected token type: {:?}", token_type)
     };
-    self.consume_expected(TokenType::Semi, "Expected a ';'");
-    decl
+    println!("{:?}", var);
+    var
+    // let is_mutable = self.consume().token_type == TokenType::Let;
+    // let ident = self.consume_expected(TokenType::Ident, "Expected a Identifier.");
+
+    // if self.at().token_type == TokenType::Semi {
+    //   self.consume();
+    //   if !is_mutable {
+    //     panic!("Const declarations must have a value");
+    //   }
+    //   let var = Stmt::VarDecl {
+    //     mutable: is_mutable,
+    //     name: ident.value,
+    //     value: None
+    //   };
+    //   return var
+    // } 
+    // self.consume_expected(TokenType::Eq, "Expected a '='");
+    // let decl = Stmt::VarDecl {
+    //   mutable: is_mutable,
+    //   name: ident.value,
+    //   value: Some(self.parse_expr())
+    // };
+    // self.consume_expected(TokenType::Semi, "Expected a ';'");
+    // decl
   }
 
   fn parse_func_decl(&mut self) -> Stmt {
@@ -198,6 +244,17 @@ impl<'a> Parser<'a> {
       body
     };
     func
+  }
+
+  fn parse_return(&mut self) -> Stmt {
+    self.consume();
+    if self.at().token_type == TokenType::Semi {
+      self.consume();
+      return Stmt::Return { value: None }
+    }
+    let value = self.parse_expr();
+    self.consume_expected(TokenType::Semi, "Expected a ';'");
+    Stmt::Return { value: Some(value) }
   }
 
   fn parse_call_member_expr(&mut self) -> Expr {

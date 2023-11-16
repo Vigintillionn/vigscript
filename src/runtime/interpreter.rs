@@ -17,8 +17,9 @@ pub fn evaluate(prog: Program, env: &mut environment::Environment) -> RuntimeVal
 pub fn evaluate_node(node: Stmt, env: &mut environment::Environment) -> RuntimeValue {
   match node {
     Stmt::Expr(node) => evaluate_expr(node, env),
-    Stmt::VarDecl { muteable, name, value } => evaluate_var_decl(muteable, name, value, env),
+    Stmt::VarDecl { mutable, name, value } => evaluate_var_decl(mutable, name, value, env),
     Stmt::FuncDecl { params, name, body } => evaluate_func_decl(params, name, body, env),
+    Stmt::Return { value: _ } => panic!("You can only return from inside a function."),
     _ => panic!("Not implemented {:?}", node)
   }
 }

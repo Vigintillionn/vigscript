@@ -60,11 +60,11 @@ impl Environment {
     env
   }
 
-  pub fn declare_var(&mut self, name: String, value: values::RuntimeValue, muteable: bool) -> values::RuntimeValue {
+  pub fn declare_var(&mut self, name: String, value: values::RuntimeValue, mutable: bool) -> values::RuntimeValue {
     if self.variables.contains_key(&name) {
       panic!("Variable {} already declared", name);
     }
-    if !muteable  {
+    if !mutable  {
       self.constants.insert(name.clone());
     }
     self.variables.insert(name, value.clone());

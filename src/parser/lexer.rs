@@ -19,6 +19,8 @@ pub enum TokenType {
   BinOp,
   Let,
   Const,
+  Mut,
+  Ret,
   EOF
 }
 
@@ -33,6 +35,8 @@ fn create_reserved() -> HashMap<&'static str, TokenType> {
   reserved.insert("let", TokenType::Let);
   reserved.insert("const", TokenType::Const);
   reserved.insert("func", TokenType::Func);
+  reserved.insert("ret", TokenType::Ret);
+  reserved.insert("mut", TokenType::Mut);
   reserved
 }
 

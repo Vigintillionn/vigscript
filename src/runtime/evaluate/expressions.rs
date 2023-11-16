@@ -2,8 +2,7 @@ use std::collections::HashMap;
 
 use crate::runtime::environment::Environment;
 use crate::runtime::values::{RuntimeValue, Object};
-use crate::parser::ast::{Expr, Property};
-use crate::runtime::interpreter::evaluate_node;
+use crate::parser::ast::{Expr, Property, Stmt};
 
 pub fn evaluate_expr(node: Expr, env: &mut Environment) -> RuntimeValue {
   match node {
@@ -72,15 +71,27 @@ pub fn evaluate_call_expr(callee: Box<Expr>, args: Vec<Expr>, env: &mut Environm
     RuntimeValue::NativeFunction { body } => body(runtime_args, env),
     RuntimeValue::Function { name: _, params, decl_env, body } => {
       let mut scope = Environment::new(Some(decl_env));
+      if params.len() != runtime_args.len() {
+        panic!("Wrong number of arguments passed to function");
+      }
       for (i, arg) in runtime_args.iter().enumerate() {
-        // TODO: Check bounds here.
-        // verify arity of function
         scope.declare_var(params[i].clone(), arg.clone(), true);
       }
 
       let mut res: RuntimeValue = RuntimeValue::Null;
       for stmt in body {
-        res = evaluate_node(stmt, &mut scope);
+        
+        match stmt {
+          Stmt::Return { value } => {
+            res = match value {
+              Some(expr) => evaluate_expr(expr, &mut scope),
+              None => RuntimeValue::Null
+            };
+            break;
+          },
+          Stmt::Expr(expr) => res = evaluate_expr(expr, &mut scope),
+          _ => res = RuntimeValue::Null
+        }
       }
       res
     },

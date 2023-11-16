@@ -2,7 +2,7 @@
 pub enum Stmt {
   Expr(Expr),
   VarDecl {
-    muteable: bool,
+    mutable: bool,
     name: String,
     value: Option<Expr>
   },
@@ -10,7 +10,10 @@ pub enum Stmt {
     params: Vec<String>,
     name: String,
     body: Vec<Stmt>
-  }
+  },
+  Return {
+    value: Option<Expr>
+  },
 }
 
 #[derive(Debug, Clone)]

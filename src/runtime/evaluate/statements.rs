@@ -3,12 +3,12 @@ use crate::runtime::environment::Environment;
 use crate::runtime::values::RuntimeValue;
 use crate::runtime::evaluate::expressions::evaluate_expr;
 
-pub fn evaluate_var_decl(muteable: bool, name: String, value: Option<Expr>, env: &mut Environment) -> RuntimeValue {
+pub fn evaluate_var_decl(mutable: bool, name: String, value: Option<Expr>, env: &mut Environment) -> RuntimeValue {
   let res = match value {
     Some(expr) => evaluate_expr(expr, env),
     None => RuntimeValue::Null
   };
-  env.declare_var(name, res, muteable)
+  env.declare_var(name, res, mutable)
 }
 
 pub fn evaluate_func_decl(params: Vec<String>, name: String, body: Vec<Stmt>, env: &mut Environment) -> RuntimeValue {
