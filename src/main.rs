@@ -36,6 +36,7 @@ fn interpret(input: &str, env: &mut runtime::environment::Environment) {
     let mut parser = parser::parser::Parser::new(&tokens);
     let ast = parser.produce_ast();
 
-    let result = runtime::interpreter::evaluate(ast, env);
-    println!("{:?}", result);
+    runtime::interpreter::evaluate(ast, env);
+    //let result = runtime::interpreter::evaluate(ast, env);
+    //println!("{:?}", result);
 }
