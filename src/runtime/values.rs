@@ -21,7 +21,10 @@ pub enum RuntimeValue {
     params: Vec<String>,
     decl_env: Environment,
     body: Vec<Stmt>
-  } 
+  },
+  String {
+    value: String
+  }
 }
 
 #[derive(Debug, Clone)]

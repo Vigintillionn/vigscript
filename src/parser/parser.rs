@@ -145,7 +145,8 @@ impl<'a> Parser<'a> {
         let expr = self.parse_expr();
         self.consume_expected(TokenType::CloseParen, "Unexpected token found inside parenthesised expression. Expected closing parenthesis, but got"); // consume the close paren
         expr
-      }
+      },
+      TokenType::StringLit => Expr::String { value: self.consume().value },
       _ => panic!("Unexpected token type: {:?}", tk),
     }
   }
@@ -195,31 +196,7 @@ impl<'a> Parser<'a> {
       },
       _ => panic!("Unexpected token type: {:?}", token_type)
     };
-    println!("{:?}", var);
     var
-    // let is_mutable = self.consume().token_type == TokenType::Let;
-    // let ident = self.consume_expected(TokenType::Ident, "Expected a Identifier.");
-
-    // if self.at().token_type == TokenType::Semi {
-    //   self.consume();
-    //   if !is_mutable {
-    //     panic!("Const declarations must have a value");
-    //   }
-    //   let var = Stmt::VarDecl {
-    //     mutable: is_mutable,
-    //     name: ident.value,
-    //     value: None
-    //   };
-    //   return var
-    // } 
-    // self.consume_expected(TokenType::Eq, "Expected a '='");
-    // let decl = Stmt::VarDecl {
-    //   mutable: is_mutable,
-    //   name: ident.value,
-    //   value: Some(self.parse_expr())
-    // };
-    // self.consume_expected(TokenType::Semi, "Expected a ';'");
-    // decl
   }
 
   fn parse_func_decl(&mut self) -> Stmt {
@@ -295,12 +272,12 @@ impl<'a> Parser<'a> {
   fn parse_member_expr(&mut self) -> Expr {
     let mut object = self.parse_primary_expr();
 
-    while self.at().token_type == TokenType::Dot || self.at().token_type == TokenType::OpenBracket {
+    while self.at().token_type == TokenType::MemAccess || self.at().token_type == TokenType::OpenBracket {
       let operator = self.consume();
       let property: Expr;
       let computed: bool;
 
-      if operator.token_type == TokenType::Dot {
+      if operator.token_type == TokenType::MemAccess {
         computed = false;
         property = self.parse_primary_expr();
 

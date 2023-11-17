@@ -12,6 +12,8 @@ pub fn evaluate_expr(node: Expr, env: &mut Environment) -> RuntimeValue {
     Expr::Assign { assignee, value } => evaluate_assignment(*assignee, *value, env),
     Expr::ObjectLit { properties } => evaluate_object_expr(properties, env),
     Expr::Call { callee, args } => evaluate_call_expr(callee, args, env),
+    Expr::Member { object, property, computed } => evaluate_member_expr(*object, *property, computed, env),
+    Expr::String { value } => RuntimeValue::String { value },
     _ => panic!("Not implemented {:?}", node)//values::RuntimeValue::Null
   }
 }
@@ -97,4 +99,8 @@ pub fn evaluate_call_expr(callee: Box<Expr>, args: Vec<Expr>, env: &mut Environm
     },
     _ => panic!("You can only call functions")
   }
+}
+
+pub fn evaluate_member_expr(object: Expr, property: Expr, computed: bool, env: &mut Environment) -> RuntimeValue {
+  RuntimeValue::Null
 }

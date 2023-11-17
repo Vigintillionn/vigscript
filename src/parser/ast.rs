@@ -45,6 +45,9 @@ pub enum Expr {
   Call {
     callee: Box<Expr>,
     args: Vec<Expr>
+  },
+  String {
+    value: String
   }
 }
 
