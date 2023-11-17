@@ -14,6 +14,11 @@ pub enum Stmt {
   Return {
     value: Option<Expr>
   },
+  If {
+    condition: Expr,
+    then_branch: Vec<Stmt>,
+    else_branch: Option<Vec<Stmt>>
+  }
 }
 
 #[derive(Debug, Clone)]

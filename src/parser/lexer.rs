@@ -13,6 +13,8 @@ pub enum TokenType {
   OpenBracket, // [
   CloseBracket, // ]
   Func,
+  If,
+  Else,
   Comma,
   Dot,
   MemAccess,
@@ -39,6 +41,8 @@ fn create_reserved() -> HashMap<&'static str, TokenType> {
   reserved.insert("func", TokenType::Func);
   reserved.insert("ret", TokenType::Ret);
   reserved.insert("mut", TokenType::Mut);
+  reserved.insert("if", TokenType::If);
+  reserved.insert("else", TokenType::Else);
   reserved
 }
 

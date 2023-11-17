@@ -47,6 +47,7 @@ impl<'a> Parser<'a> {
       TokenType::Const => self.parse_var_decl(),
       TokenType::Func => self.parse_func_decl(),
       TokenType::Ret => self.parse_return(),
+      TokenType::If => self.parse_if_stmt(),
       _ => {
         let expr = self.parse_expr();
         Stmt::Expr(expr)
@@ -208,13 +209,7 @@ impl<'a> Parser<'a> {
         _ => panic!("Expected an identifier as function argument")
       }
     }).collect();
-
-    self.consume_expected(TokenType::OpenBrace, "Expected a '{' to open function body.");
-    let mut body: Vec<Stmt> = Vec::new();
-    while self.at().token_type != TokenType::EOF && self.at().token_type != TokenType::CloseBrace {
-      body.push(self.parse_stmt());
-    }
-    self.consume_expected(TokenType::CloseBrace, "Expected a '}' to close function body.");
+    let body = self.parse_block();
     let func = Stmt::FuncDecl {
       params,
       name,
@@ -297,6 +292,34 @@ impl<'a> Parser<'a> {
       }
     }
     object
+  }
+
+  fn parse_if_stmt(&mut self) -> Stmt {
+    self.consume();
+    let condition = self.parse_expr();
+    let body = self.parse_block();
+
+    let mut else_body: Option<Vec<Stmt>> = None;
+    if self.at().token_type == TokenType::Else {
+      self.consume();
+      else_body = Some(self.parse_block());
+    }
+    Stmt::If {
+      condition,
+      then_branch: body,
+      else_branch: else_body
+    }
+  }
+
+  fn parse_block(&mut self) -> Vec<Stmt> {
+    self.consume_expected(TokenType::OpenBrace, "Expected a '{' to open block.");
+    let mut body: Vec<Stmt> = Vec::new();
+
+    while self.not_eof() && self.at().token_type != TokenType::CloseBrace {
+      body.push(self.parse_stmt());
+    }
+    self.consume_expected(TokenType::CloseBrace, "Expected a '}' to close block.");
+    body
   }
 }
 
