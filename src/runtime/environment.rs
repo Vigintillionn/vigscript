@@ -7,10 +7,16 @@ pub fn create_global_environment() -> Environment {
   env.declare_var("false".to_string(), values::RuntimeValue::Bool { value: false }, false);
   env.declare_var("null".to_string(), values::RuntimeValue::Null, false);
 
-  env.declare_var("print".to_string(), values::RuntimeValue::NativeFunction { 
+  env.declare_var("print!".to_string(), values::RuntimeValue::NativeFunction { 
     body: |args, _| {
       for arg in args {
-        println!("{:?}", arg);
+        match arg {
+          values::RuntimeValue::String { value } => print!("{}", value),
+          values::RuntimeValue::Number { value } => print!("{}", value),
+          values::RuntimeValue::Bool { value } => print!("{}", value),
+          values::RuntimeValue::Null => print!("null"),
+          _ => print!("{:?}", arg)
+        }
       }
       values::RuntimeValue::Null
     }
