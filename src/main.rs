@@ -9,6 +9,9 @@ fn main() {
 
     if args.len() > 1 {
         let filename = &args[1];
+        if !filename.ends_with(".vig") {
+            panic!("File must end with .vig");
+        }
         let contents = fs::read_to_string(filename).expect("Something went wrong reading the file");
 
         interpret(&contents, &mut env);
