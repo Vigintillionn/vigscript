@@ -1,6 +1,6 @@
 use std::iter::Peekable;
-use crate::parser::ast::{Expr, Stmt, Program, Property};
-use crate::parser::lexer::{Token, TokenType};
+use crate::frontend::ast::{Expr, Stmt, Program, Property};
+use crate::frontend::lexer::{Token, TokenType};
 
 pub struct Parser<'a> {
   tokens: Peekable<std::slice::Iter<'a, Token>>,
