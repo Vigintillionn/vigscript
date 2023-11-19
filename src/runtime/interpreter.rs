@@ -3,7 +3,6 @@ use crate::runtime::environment;
 use crate::runtime::evaluate::expressions::evaluate_expr;
 use crate::runtime::evaluate::statements::{evaluate_var_decl, evaluate_func_decl, evaluate_if_stmt};
 use crate::parser::ast::{Program, Stmt};
-use core::panic;
 
 
 pub fn evaluate(prog: Program, env: &mut environment::Environment) -> RuntimeValue {

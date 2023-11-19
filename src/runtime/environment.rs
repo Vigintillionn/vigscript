@@ -21,13 +21,6 @@ pub fn create_global_environment() -> Environment {
       values::RuntimeValue::Null
     }
   }, false);
-  // env.declare_var("now".to_string(), values::RuntimeValue::NativeFunction {
-  //   body: |_, _| {
-  //     let start = std::time::SystemTime::now();
-  //     let since_the_epoch = start.duration_since(std::time::UNIX_EPOCH).expect("Time went backwards");
-  //     values::RuntimeValue::Number { value: since_the_epoch.as_secs_f32() }
-  //   }
-  // }, false);
 
   env.declare_var("Date".to_string(), values::RuntimeValue::Object(values::Object {
     properties: {
