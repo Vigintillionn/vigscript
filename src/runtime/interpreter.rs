@@ -1,7 +1,7 @@
 use crate::runtime::values::RuntimeValue;
 use crate::runtime::environment;
 use crate::runtime::evaluate::expressions::evaluate_expr;
-use crate::runtime::evaluate::statements::{evaluate_var_decl, evaluate_func_decl};
+use crate::runtime::evaluate::statements::{evaluate_var_decl, evaluate_func_decl, evaluate_if_stmt};
 use crate::parser::ast::{Program, Stmt};
 use core::panic;
 
@@ -20,6 +20,7 @@ pub fn evaluate_node(node: Stmt, env: &mut environment::Environment) -> RuntimeV
     Stmt::VarDecl { mutable, name, value } => evaluate_var_decl(mutable, name, value, env),
     Stmt::FuncDecl { params, name, body } => evaluate_func_decl(params, name, body, env),
     Stmt::Return { value: _ } => panic!("You can only return from inside a function."),
+    Stmt::If { condition, then_branch, else_branch } => evaluate_if_stmt(condition, then_branch, else_branch, env),
     _ => panic!("Not implemented {:?}", node)
   }
 }
