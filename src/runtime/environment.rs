@@ -1,5 +1,5 @@
 use std::collections::{HashMap, HashSet};
-use crate::{runtime::values::{self, RuntimeValue}, parser::ast::Expr};
+use crate::{runtime::values::{self, RuntimeValue}, frontend::ast::Expr};
 
 pub fn create_global_environment() -> Environment {
   let mut env = Environment::new(None);

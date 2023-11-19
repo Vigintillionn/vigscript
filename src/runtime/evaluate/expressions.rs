@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::runtime::environment::Environment;
 use crate::runtime::values::{RuntimeValue, Object};
-use crate::parser::ast::{Expr, Property, Stmt};
+use crate::frontend::ast::{Expr, Property, Stmt};
 
 pub fn evaluate_expr(node: Expr, env: &mut Environment) -> RuntimeValue {
   match node {

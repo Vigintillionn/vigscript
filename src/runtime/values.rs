@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::runtime::environment::Environment;
-use crate::parser::ast::Stmt;
+use crate::frontend::ast::Stmt;
 
 #[derive(Debug, Clone)]
 pub enum RuntimeValue {
