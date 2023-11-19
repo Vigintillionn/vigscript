@@ -37,6 +37,14 @@ pub fn evaluate_binary_expr(left: Expr, op: String, right: Expr, env: &mut Envir
         _ => RuntimeValue::Null
       }
     },
+    (RuntimeValue::String { value: lhs }, RuntimeValue::String { value: rhs }) => {
+      match op.as_str() {
+        "+" => RuntimeValue::String { value: lhs + &rhs },
+        "==" => RuntimeValue::Bool { value: equals(RuntimeValue::String { value: lhs }, RuntimeValue::String { value: rhs }, true) },
+        "!=" => RuntimeValue::Bool { value: equals(RuntimeValue::String { value: lhs }, RuntimeValue::String { value: rhs }, false) },
+        _ => RuntimeValue::Null
+      }
+    },
     _ => RuntimeValue::Null
   }
 }
