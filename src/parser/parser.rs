@@ -109,7 +109,7 @@ impl<'a> Parser<'a> {
   fn parse_additive_expr(&mut self) -> Expr {
     let mut left = self.parse_multiplicitive_expr();
 
-    while self.at().value == "+" || self.at().value == "-" {
+    while self.at().value == "+" || self.at().value == "-" || self.at().value == "==" || self.at().value == "!=" || self.at().value == "<" || self.at().value == ">" {
       let op = self.consume().value;
       let right = self.parse_multiplicitive_expr();
       left = Expr::BinExp { 

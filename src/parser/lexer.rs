@@ -12,6 +12,11 @@ pub enum TokenType {
   CloseBrace, // }
   OpenBracket, // [
   CloseBracket, // ]
+  EqCompare,
+  NotEqCompare,
+  LessThan,
+  GreaterThan,
+  Not,
   Func,
   If,
   Else,
@@ -83,7 +88,24 @@ pub fn tokenize(src: &str) -> Vec<Token> {
       }
       ',' => tokens.push(Token { token_type: TokenType::Comma, value: ch.to_string() }),
       '.' => tokens.push(Token { token_type: TokenType::Dot, value: ch.to_string() }),
-      '=' => tokens.push(Token { token_type: TokenType::Eq, value: ch.to_string() }),
+      '=' => {
+        if let Some('=') = chars.peek() {
+          chars.next();
+          tokens.push(Token { token_type: TokenType::EqCompare, value: "==".to_string() });
+        } else {
+          tokens.push(Token { token_type: TokenType::Eq, value: ch.to_string() });
+        }
+      },
+      '!' => {
+        if let Some('=') = chars.peek() {
+          chars.next();
+          tokens.push(Token { token_type: TokenType::NotEqCompare, value: "!=".to_string() });
+        } else {
+          tokens.push(Token { token_type: TokenType::Not, value: ch.to_string() });
+        }
+      },
+      '>' => tokens.push(Token { token_type: TokenType::GreaterThan, value: ch.to_string() }),
+      '<' => tokens.push(Token { token_type: TokenType::LessThan, value: ch.to_string() }),
       ';' => tokens.push(Token { token_type: TokenType::Semi, value: ch.to_string() }),
       '+' | '-' | '*' | '/' | '%' => tokens.push(Token { token_type: TokenType::BinOp, value: ch.to_string() }),
       '0' ..= '9' => {
