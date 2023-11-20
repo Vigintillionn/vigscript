@@ -9,7 +9,7 @@ pub fn create_global_environment() -> Environment {
 
   env.declare_var("print!".to_string(), values::RuntimeValue::NativeFunction { 
     body: |args, _| {
-      for arg in args {
+      for (j, arg) in args.iter().enumerate() {
         match arg {
           values::RuntimeValue::String { value } => print!("{}", value),
           values::RuntimeValue::Number { value } => print!("{}", value),
@@ -27,8 +27,11 @@ pub fn create_global_environment() -> Environment {
           },
           _ => print!("{:?}", arg)
         }
-        print!("\n");
+        if j != args.len() - 1 {
+          print!(" ");
+        }
       }
+      print!("\n");
       values::RuntimeValue::Null
     }
   }, false);

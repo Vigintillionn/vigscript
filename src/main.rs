@@ -36,10 +36,8 @@ fn repl(env: &mut runtime::environment::Environment) {
 
 fn interpret(input: &str, env: &mut runtime::environment::Environment) {
     let tokens = frontend::lexer::tokenize(&input);
-    print!("{:?}", tokens);
     let mut parser = frontend::parser::Parser::new(&tokens);
     let ast = parser.produce_ast();
-    println!("{:?}", ast);
 
     runtime::interpreter::evaluate(ast, env);
     //let result = runtime::interpreter::evaluate(ast, env);
