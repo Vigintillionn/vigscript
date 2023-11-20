@@ -47,6 +47,70 @@ pub fn create_global_environment() -> Environment {
     }
   }), false);
 
+  env.declare_var("Array".to_string(), values::RuntimeValue::Object(values:: Object {
+    properties: {
+      let mut map = HashMap::new();
+      map.insert("new".to_string(), values::RuntimeValue::NativeFunction {
+        body: |args, _| {
+          let amount = match args.get(0) {
+            Some(values::RuntimeValue::Number { value }) => *value as usize,
+            _ => 0
+          };
+          let mut elements = Vec::new();
+          for _ in 0..amount {
+            elements.push(values::RuntimeValue::Null);
+          }
+          values::RuntimeValue::Array { elements }
+        }
+      });
+      map.insert("from".to_string(), values::RuntimeValue::NativeFunction {
+        body: |args, _| {
+          let mut elements = Vec::new();
+          for arg in args {
+            elements.push(arg);
+          }
+          values::RuntimeValue::Array { elements }
+        }
+      });
+      map.insert("has".to_string(), values::RuntimeValue::NativeFunction {
+        body: |args, _| {
+          let array = match args.get(0) {
+            Some(values::RuntimeValue::Array { elements }) => elements,
+            _ => panic!("First argument must be an array")
+          };
+          let value = match args.get(1) {
+            Some(value) => value,
+            _ => panic!("Second argument must be a value")
+          };
+          let mut has = false;
+          for element in array {
+            if element == value {
+              has = true;
+              break;
+            }
+          }
+          values::RuntimeValue::Bool { value: has }
+        }
+      });
+      map.insert("concat".to_string(), values::RuntimeValue::NativeFunction {
+        body: |args, _| {
+          let array = match args.get(0) {
+            Some(values::RuntimeValue::Array { elements }) => elements,
+            _ => panic!("First argument must be an array")
+          };
+          let value = match args.get(1) {
+            Some(value) => value,
+            _ => panic!("Second argument must be a value")
+          };
+          let mut elements = array.clone();
+          elements.push(value.clone());
+          values::RuntimeValue::Array { elements }
+        }
+      });
+      map
+    }
+  }), false);
+
   env
 }
 
