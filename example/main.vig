@@ -1,0 +1,7 @@
+let x = 5;
+
+for let i in [3, 4, 5, 6] {
+  if (i + x) % 2 == 0 {
+    print!(i + x)
+  }
+}
