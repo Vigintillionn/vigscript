@@ -1,5 +1,5 @@
 [package]
-name = "rust_lang"
+name = "vigscript"
 version = "0.1.0"
 edition = "2021"
 

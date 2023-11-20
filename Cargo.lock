@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "rust_lang"
+name = "vigscript"
 version = "0.1.0"
