@@ -27,8 +27,8 @@ pub fn create_global_environment() -> Environment {
           },
           _ => print!("{:?}", arg)
         }
+        print!("\n");
       }
-      print!("\n");
       values::RuntimeValue::Null
     }
   }, false);
