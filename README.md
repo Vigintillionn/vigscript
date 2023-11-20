@@ -28,6 +28,7 @@ I don't know. It's a terrible language, which is totally not optimised but have 
 
 ## Syntax
 
+An example can be found in the `example` directory.
 I wanted to combine the syntax of some of my favorite languages. You will probably recognize a lot.
 *Disclaimer: The syntax is subject to change in the future.*
 
