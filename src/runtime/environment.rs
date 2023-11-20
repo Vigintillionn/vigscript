@@ -49,7 +49,7 @@ pub fn create_global_environment() -> Environment {
   env
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Environment {
   parent: Option<Box<Environment>>,
   variables: HashMap<String, values::RuntimeValue>,

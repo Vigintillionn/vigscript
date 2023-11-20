@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::runtime::environment::Environment;
 use crate::frontend::ast::Stmt;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum RuntimeValue {
   Null,
   Number {
@@ -30,7 +30,7 @@ pub enum RuntimeValue {
   }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Object {
   pub properties: HashMap<String, RuntimeValue>
 }

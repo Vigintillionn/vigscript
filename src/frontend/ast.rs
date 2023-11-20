@@ -1,4 +1,4 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Stmt {
   Expr(Expr),
   VarDecl {
@@ -21,7 +21,7 @@ pub enum Stmt {
   }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Expr {
   BinExp {
     left: Box<Expr>,
@@ -64,7 +64,7 @@ pub struct Program {
   pub body: Vec<Stmt>
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Property {
   pub key: String,
   pub value: Option<Box<Expr>>

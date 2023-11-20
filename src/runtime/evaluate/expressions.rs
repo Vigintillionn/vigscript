@@ -59,6 +59,19 @@ pub fn evaluate_binary_expr(left: Expr, op: String, right: Expr, env: &mut Envir
         _ => RuntimeValue::Null
       }
     },
+    (lhs, RuntimeValue::Array { elements }) => {
+      match op.as_str() {
+        "in" => {
+          let contains_element = elements.contains(&lhs);
+          RuntimeValue::Bool { value: contains_element }
+        },
+        _ => RuntimeValue::Null
+      }
+    },
+    // (RuntimeValue::Bool { value: lhs } | RuntimeValue::Number { value: lhs } | RuntimeValue::String { value: lhs }, RuntimeValue::Array { elements }) => {
+    //   let contains_element = elements.contains(&lhs);
+    //   RuntimeValue::Bool { value: contains_element }
+    // },
     _ => RuntimeValue::Null
   }
 }

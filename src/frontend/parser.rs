@@ -48,6 +48,7 @@ impl<'a> Parser<'a> {
       TokenType::Func => self.parse_func_decl(),
       TokenType::Ret => self.parse_return(),
       TokenType::If => self.parse_if_stmt(),
+      TokenType::For => self.parse_for_stmt(),
       _ => {
         let expr = self.parse_expr();
         Stmt::Expr(expr)
@@ -109,7 +110,7 @@ impl<'a> Parser<'a> {
   fn parse_additive_expr(&mut self) -> Expr {
     let mut left = self.parse_multiplicitive_expr();
 
-    while self.at().value == "+" || self.at().value == "-" || self.at().value == "==" || self.at().value == "!=" || self.at().value == "<" || self.at().value == ">" {
+    while self.at().value == "+" || self.at().value == "-" || self.at().value == "==" || self.at().value == "!=" || self.at().value == "<" || self.at().value == ">" || self.at().value == "in" {
       let op = self.consume().value;
       let right = self.parse_multiplicitive_expr();
       left = Expr::BinExp { 
@@ -148,6 +149,18 @@ impl<'a> Parser<'a> {
         expr
       },
       TokenType::StringLit => Expr::String { value: self.consume().value },
+      TokenType::OpenBracket => {
+        self.consume();
+        let mut elements = Vec::new();
+        while self.at().token_type != TokenType::EOF && self.at().token_type != TokenType::CloseBracket {
+          elements.push(self.parse_expr());
+          if self.at().token_type != TokenType::CloseBracket {
+            self.consume_expected(TokenType::Comma, "Expected a ','");
+          }
+        };
+        self.consume_expected(TokenType::CloseBracket, "Expected a ']'");
+        Expr::Array { elements }
+      }
       _ => panic!("Unexpected token type: {:?}", tk),
     }
   }
@@ -320,6 +333,10 @@ impl<'a> Parser<'a> {
     }
     self.consume_expected(TokenType::CloseBrace, "Expected a '}' to close block.");
     body
+  }
+
+  fn parse_for_stmt(&mut self) -> Stmt {
+    todo!()
   }
 }
 
