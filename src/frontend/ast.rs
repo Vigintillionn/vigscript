@@ -31,6 +31,9 @@ pub enum Expr {
   IntLit {
     value: f32
   },
+  Array {
+    elements: Vec<Expr>
+  },
   Ident {
     symbol: String
   },

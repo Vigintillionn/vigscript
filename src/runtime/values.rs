@@ -24,6 +24,9 @@ pub enum RuntimeValue {
   },
   String {
     value: String
+  },
+  Array {
+    elements: Vec<RuntimeValue>
   }
 }
 

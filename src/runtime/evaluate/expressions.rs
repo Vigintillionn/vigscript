@@ -7,6 +7,13 @@ use crate::frontend::ast::{Expr, Property, Stmt};
 pub fn evaluate_expr(node: Expr, env: &mut Environment) -> RuntimeValue {
   match node {
     Expr::IntLit { value } => RuntimeValue::Number { value },
+    Expr::Array { elements } => {
+      let mut array = Vec::new();
+      for element in elements {
+        array.push(evaluate_expr(element, env));
+      }
+      RuntimeValue::Array { elements: array }
+    },
     Expr::BinExp { left, op, right } => evaluate_binary_expr(*left, op, *right, env),
     Expr::Ident { symbol } => evaluate_ident(symbol, env),
     Expr::Assign { assignee, value } => evaluate_assignment(*assignee, *value, env),
@@ -124,7 +131,7 @@ pub fn evaluate_call_expr(callee: Box<Expr>, args: Vec<Expr>, env: &mut Environm
 pub fn evaluate_member_expr(node: Expr, env: &mut Environment) -> RuntimeValue {
   // env.lookup_object_member(node)
   match node {
-    Expr::Member { object, property, computed } => env.lookup_object_member(object, property, computed, None),
+    Expr::Member { object, property, computed } => env.lookup_object_member(Some(object), None, property, computed),
     Expr::Ident { symbol } => env.lookup_var(symbol),
     _ => panic!("Oh oh")
   }
