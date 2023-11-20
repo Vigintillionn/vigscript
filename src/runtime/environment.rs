@@ -28,6 +28,7 @@ pub fn create_global_environment() -> Environment {
           _ => print!("{:?}", arg)
         }
       }
+      print!("\n");
       values::RuntimeValue::Null
     }
   }, false);
@@ -78,6 +79,13 @@ impl Environment {
     }
     self.variables.insert(name, value.clone());
     value
+  }
+
+  pub fn void_var(&mut self, name: String) -> values::RuntimeValue {
+    if self.variables.contains_key(&name) {
+      self.variables.remove(&name.clone());
+    }
+    values::RuntimeValue::Null
   }
 
   pub fn assign_var(&mut self, name: String, value: &values::RuntimeValue) -> values::RuntimeValue {

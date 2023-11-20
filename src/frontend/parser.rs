@@ -336,7 +336,19 @@ impl<'a> Parser<'a> {
   }
 
   fn parse_for_stmt(&mut self) -> Stmt {
-    todo!()
+    self.consume();
+    self.consume_expected(TokenType::Let, "Expected a 'let' to declare loop variable.");
+    let ident = self.consume_expected(TokenType::Ident, "Expected a Identifier as loop variable.");
+    self.consume_expected(TokenType::In, "Expected a 'in' to start loop.");
+
+    let iterable = self.parse_expr();
+    let body = self.parse_block();
+
+    Stmt::For {
+      ident: ident.value,
+      iterable: Box::new(iterable),
+      body
+    }
   }
 }
 

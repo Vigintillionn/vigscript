@@ -18,6 +18,11 @@ pub enum Stmt {
     condition: Expr,
     then_branch: Vec<Stmt>,
     else_branch: Option<Vec<Stmt>>
+  },
+  For {
+    ident: String,
+    iterable: Box<Expr>,
+    body: Vec<Stmt>
   }
 }
 

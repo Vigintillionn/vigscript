@@ -56,8 +56,27 @@ pub fn evaluate_branch(branch: Vec<Stmt>, env: &mut Environment) -> RuntimeValue
         break;
       },
       Stmt::Expr(expr) => res = evaluate_expr(expr, env),
+      Stmt::If { condition, then_branch, else_branch } => res = evaluate_if_stmt(condition, then_branch, else_branch, env),
+      Stmt::For { ident, iterable, body } => res = evaluate_for_stmt(ident, *iterable, body, env),
       _ => res = RuntimeValue::Null
     }
   }
   res
+}
+
+pub fn evaluate_for_stmt(ident: String, iterable: Expr, body: Vec<Stmt>, env: &mut Environment) -> RuntimeValue {
+  let iterable = evaluate_expr(iterable, env);
+  match iterable {
+    RuntimeValue::Array { elements } => {
+      let mut res: RuntimeValue = RuntimeValue::Null;
+      env.declare_var(ident.clone(), elements.first().unwrap().clone(), true);
+      for element in elements {
+        env.assign_var(ident.clone(), &element);
+        res = evaluate_branch(body.clone(), env);
+      }
+      env.void_var(ident);
+      res
+    },
+    _ => panic!("You can only iterate over arrays")
+  }
 }
